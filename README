@@ -1,4 +1,83 @@
-DirectAdmin Rails Plugin 0.1
-============================
+=== DirectAdmin Rails Plugin 0.1
+. 
+. Created by: Joshua Delsman, Voxxit, LLC - jdelsman@voxxit.com
+. Last Modified: June 1, 2008
+. See: http://www.directadmin.com/api.html
+.
+===
 
-Copyright (c) 2008 Voxxit, LLC, released under the MIT license
+The DirectAdmin Rails plugin provides you with a communication
+class for interfacing directly with your DirectAdmin Web Control
+Panel.
+
+NOTE: I would recommend that until DA decides to move to an XML-
+based system, that you only use the commands which start with "CMD_API",
+most of which are updated here:
+
+ - http://www.directadmin.com/search_versions.php?query=CMD_API
+
+== Usage
+
+1. Install the plugin. You can download the .tar.gz file directly
+from here:
+
+	Git: 
+	
+	$ cd vendors/plugin
+	$ mkdir directadmin
+	$ git clone git://github.com/voxxit/directadmin-rails-plugin.git
+	
+	.tar.gz:
+	
+	$ cd vendors/plugin
+	$ curl -C - -O 'http://voxxit.com/directadmin-0.1.tar.gz'
+	$ tar -zxf directadmin-0.1.tar.gz
+	
+	or
+	
+	$ wget http://voxxit.com/directadmin-0.1.tar.gz
+	$ tar -zxf directadmin-0.1.tar.gz
+	
+2. Add the connection call to your controller, as follows:
+
+  	@da = DirectAdmin::Base.new(:username       => "admin",
+                                :password       => "password",
+                                :host           => "http://host.com:2222/",
+                                :port           => "2222",
+                                :failure_email  => "admins@email.com")
+
+3. If the API command requires form data, such as username or password,
+you'll need to insert some form data. Here is an example from the
+CMD_API_ACCOUNT_USER command:
+
+    form_data = {:action    => 'create',
+             	 :add       => 'Submit',
+             	 :username  => 'sampleuser',
+             	 :email     => 'email@address.com',
+             	 :passwd    => 'sample_Password',
+             	 :passwd2   => 'sample_Password',
+             	 :domain    => 'sample.com',
+             	 :package   => 'packagename',
+             	 :ip        => '127.0.0.1',
+             	 :notify    => 'yes'}
+
+4. Make the call! You will need to invoke the "do" method, which will
+communicate with the server, perform the function, and then report back
+with a URL encoded array/string:
+
+	@show_users = @da.do(:command => "CMD_API_SHOW_USERS")
+
+5. Optional: You can elect to parse the data into a useable and pretty
+handy hash, if you'd like. 
+
+	@hash = @da.parse(@show_users.body)
+	
+=== Questions/Comments/Feedback?
+
+I can provide very, very limited support via e-mail at jdelsman@voxxit.com.
+However, your best bet is to ask first in the API forums:
+
+ - http://directadmin.com/forum/forumdisplay.php?f=41
+
+===============================================================
+Copyright (c) 2008 Voxxit, LLC, released under the MIT license.

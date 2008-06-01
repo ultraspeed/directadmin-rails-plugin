@@ -29,13 +29,12 @@ module DirectAdmin #:nodoc:
     VERSION = "0.1"
     
 	  # Defines the required parameters to interface with DA
-  	REQUIRED_OPTIONS = {:base   => [:username, :password, :host, :port, :failure_email],
+  	REQUIRED_OPTIONS = {:base   => [:username, :password, :host, :failure_email],
   	                    :do     => [:command]}
 
   	attr_accessor :username,
                   :password,
                   :host,
-                  :port,
                   :ssl,
                   :failure_email
 
@@ -47,15 +46,13 @@ module DirectAdmin #:nodoc:
     #   da = DirectAdmin::Base.new(:username      => USERNAME,
     #                              :password	    => PASSWORD,
     #                              :host          => HOST,
-  	#							                 :port          => PORT,
   	#							                 :ssl           => SSL,
   	#                              :failure_email => FAILURE_EMAIL)
     #
     # === Required options for new
     #   :username       - Your DirectAdmin administrator username
     #   :password       - Your DirectAdmin administrator password
-    #   :host           - DirectAdmin's hostname
-  	#   :port           - DirectAdmin's port number
+    #   :host           - DirectAdmin's hostname/port
   	#   :failure_email  - E-mail address to send failure messages to
   	#
   	# === Optional options for new
