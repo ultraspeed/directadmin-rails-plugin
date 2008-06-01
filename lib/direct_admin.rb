@@ -29,7 +29,7 @@ module DirectAdmin #:nodoc:
     VERSION = "0.1"
     
 	  # Defines the required parameters to interface with DA
-  	REQUIRED_OPTIONS = {:base   => [:username, :password, :host, :port, :ssl, :failure_email],
+  	REQUIRED_OPTIONS = {:base   => [:username, :password, :host, :port, :failure_email],
   	                    :do     => [:command]}
 
   	attr_accessor :username,
@@ -56,8 +56,10 @@ module DirectAdmin #:nodoc:
     #   :password       - Your DirectAdmin administrator password
     #   :host           - DirectAdmin's hostname
   	#   :port           - DirectAdmin's port number
-  	#   :ssl            - Enable or disable SSL. Defaults to false!
   	#   :failure_email  - E-mail address to send failure messages to
+  	#
+  	# === Optional options for new
+  	#   :ssl            - Enable or disable SSL. Defaults to false!
   	def initialize(options = {})
   	  check_required_options(:base, options)
 
@@ -66,6 +68,7 @@ module DirectAdmin #:nodoc:
   	  @host				    = options[:host]
   	  @ssl				    = options[:ssl]           || false
   	  @failure_email	= options[:failure_email]
+  	  
   	end
 
     # Completes a command on the DirectAdmin server.
@@ -121,54 +124,6 @@ module DirectAdmin #:nodoc:
       end
   	  
   	end
-
-    # OLD *** Function to create a new service account on the server...
-    #def create(username, email, password, domain_name, package_name, ip)
-
-      ## Look at CMD_API_ACCOUNT_USER
-      ## Might use that instead of CMD_ACCOUNT_USER (gives 0 or 1 error messages)
-
-      #connect("/CMD_ACCOUNT_USER")
-      #@request = Net::HTTP::Post.new(@url.path)
-      #set_login
-
-      #@request.form_data = [
-      #  "action" => "create",
-      #  "add" => "Submit",
-      #  "username" => username,
-      #  "email" => email,
-      #  "passwd" => password,
-      #  "passwd2" => passwd,
-      #  "domain" => domain_name,
-      #  "package" => package_name,
-      #  "ip" => ip,
-      #  "notify" => "no"
-      #]
-
-      #@result = Net::HTTP.new(@url.host).start {|http| 
-      #  http.request(@request)
-      #}
-
-      # Error checking
-      #case @result
-      #when Net::HTTPSuccess
-      #  if @result.include? "Domain Created Successfully"
-      #    # Success! Decide what to do here once we test..
-      #  elsif !@result.include? "Domain Created Successfully"
-      #    # All connected, but it wasn't created successfully
-      #    Notifier.deliver_error_message("[DIRECTADMIN] Client Creation Failed", "A failure occurred while logging in to the DirectAdmin server. Please check to make sure the package exists on the server, that the username is 4-8 characters long and that the e-mail address and domain name are correctly formatted. Also, make sure that the chosen IP address is available on the server and that the password doesn't contain any illegal characters.")
-      #  elsif @result.include? "Please enter your Username and Password"
-      #    # Login failed
-      #    Notifier.deliver_error_message(LOGIN_ERR_SUBJECT, LOGIN_ERR)
-      #  else
-      #  end
-      #else
-      #  if @result == ""
-      #    # Connection failed
-      #    Notifier.deliver_error_message(CONNECT_ERR_SUBJECT, CONNECT_ERR)
-      #  end
-      #end
-    #end
 	
 	  private
       # Checks the supplied options for a given method or field and throws an exception if anything is missing
