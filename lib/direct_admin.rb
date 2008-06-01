@@ -122,6 +122,38 @@ module DirectAdmin #:nodoc:
     	end
   	  
   	end
+  	
+  	# Used to parse the response (URL encoded) into a useable hash, if one would like.
+  	#
+  	# === Example
+  	#   @result = @directadmin.parse(@create.body)
+  	#
+  	# === Result
+  	#   { "list[]" => ["user1", "user2", "user3"] }
+  	
+  	def parse(response)
+  	  # Delimiter
+  	  d = "&;"
+  	  
+  	  @response = response
+  	  
+  	  params = {}
+      (@response||'').split(/[#{d}] */n).inject(params) { |h,p|
+        k, v=CGI.unescape(p).split('=',2)
+        if cur = params[k]
+          if cur.class == Array
+            params[k] << v  
+          else
+            params[k] = [cur, v]
+          end
+        else
+          params[k] = v
+        end
+      }
+      
+      return params
+  	  
+	  end
 	
 	  private
       # Checks the supplied options for a given method or field and throws an exception if anything is missing
