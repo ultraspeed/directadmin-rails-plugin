@@ -103,25 +103,23 @@ module DirectAdmin #:nodoc:
   	  check_required_options(:do, options)
   	  
   	  @command = options[:command]
-      
+  	  
+      url = URI.parse(@host + @command)
+      req = Net::HTTP::Post.new(url.path)
+      req.basic_auth @username, @password
       # For POST requests..
       if options[:formdata]
-        url = URI.parse(@host + @command)
-        req = Net::HTTP::Post.new(url.path)
-        req.basic_auth @username, @password
         req.set_form_data(options[:formdata])
-        @response = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
-      
-        if @response
-    	    # @response.code = 200 | 404 | 500, etc.
-      	  # @response.body = *text of returned page*
-      	  return @response
-    	  else
-    	    raise DirectAdminError.new("Unable to connect to DirectAdmin.")
-    	  end
-      else
-        # Nothing yet
       end
+      @response = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
+      
+      if @response
+    	  # @response.code = 200 | 404 | 500, etc.
+        # @response.body = *text of returned page*
+        return @response
+    	else
+    	  raise DirectAdminError.new("Unable to connect to DirectAdmin.")
+    	end
   	  
   	end
 	
