@@ -1,7 +1,8 @@
 === DirectAdmin Rails Plugin 0.1
 . 
 . Created by: Joshua Delsman, Voxxit, LLC - jdelsman@voxxit.com
-. Last Modified: June 1, 2008
+. Last Modified: July 31, 2008
+. Contributions by Ed Laczynski - edltech+rails@gmail.com
 . See: http://www.directadmin.com/api.html
 .
 ===
@@ -46,7 +47,7 @@ from here:
                                 :port           => "2222",
                                 :failure_email  => "admins@email.com")
 
-3. If the API command requires form data, such as username or password,
+3. If the API command requires POST and additional form data, such as username or password,
 you'll need to insert some form data. Here is an example from the
 CMD_API_ACCOUNT_USER command:
 
@@ -61,13 +62,24 @@ CMD_API_ACCOUNT_USER command:
              	 :ip        => '127.0.0.1',
              	 :notify    => 'yes'}
 
-4. Make the call! You will need to invoke the "do" method, which will
+4. If the API command requires GET (like CMD_API_SHOW_USER_DOMAINS does), you'll need to add the option :method => 'get' to your call and whatever GET parameters are required.
+
+
+5. Make the call! You will need to invoke the "do" method, which will
 communicate with the server, perform the function, and then report back
 with a URL encoded array/string:
 
+	Example with POST-enabled API call:
+	
 	@show_users = @da.do(:command => "CMD_API_SHOW_USERS")
 
-5. Optional: You can elect to parse the data into a useable and pretty
+
+	Example with GET-enabled API call:
+	
+	@show_user_domains =@da.do(:command => "CMD_API_SHOW_USER_DOMAINS", 
+							   :method => 'get',:user => user)
+
+6. Optional: You can elect to parse the data into a useable and pretty
 handy hash, if you'd like. 
 
 	@hash = @da.parse(@show_users.body)
