@@ -95,21 +95,46 @@ module DirectAdmin #:nodoc:
     #               :package => 'samplePackage',
     #               :ip => '10.0.0.0',
     #               :notify => 'no'}
-    
+    #
+    # === Option GET parameters
+    # pass option GET parameters (like user) directly in as options
+ 
   	def do(options = {})
   	  check_required_options(:do, options)
   	  
   	  @command = options[:command]
-  	  
+
       url = URI.parse(@host + @command)
-      req = Net::HTTP::Post.new(url.path)
-      req.basic_auth @username, @password
-      # For POST requests..
-      if options[:formdata]
-        req.set_form_data(options[:formdata])
+          
+      #For GET Requests
+      #Some API actions, like CMD_API_SHOW_USER_DOMAINS must be requested via get
+      if options[:method] == 'get'
+    
+        query = ''
+        query_string = options.select {|k,v| not %w[command method].include?(k)}
+              unless query_string.empty?
+                query_params = query_string.collect {|k,v| "#{k}=#{v}"}
+                query << "?" << query_params.join("&")
+              end
+        
+        req = Net::HTTP::Get.new('/'+ @command + query)
+        req.basic_auth @username, @password
+        
+        @response =  Net::HTTP.new( url.host, url.port).start {|http| http.request(req) }
+        
+
+      else
+        req = Net::HTTP::Post.new(url.path)
+        req.basic_auth @username, @password
+        # For POST requests..
+        if options[:formdata]
+          req.set_form_data(options[:formdata])
+        end
+        @response = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
+        
       end
-      @response = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
       
+  
       if @response
     	  # @response.code = 200 | 404 | 500, etc.
         # @response.body = *text of returned page*
@@ -119,7 +144,7 @@ module DirectAdmin #:nodoc:
     	end
   	  
   	end
-  	
+	
   	# Used to parse the response (URL encoded) into a useable hash, if one would like.
   	#
   	# === Example
