@@ -29,14 +29,19 @@ module DirectAdmin #:nodoc:
     VERSION = "0.1"
     
 	  # Defines the required parameters to interface with DA
-  	REQUIRED_OPTIONS = {:base   => [:username, :password, :host, :failure_email],
-  	                    :do     => [:command]}
+  	REQUIRED_OPTIONS = {
+  	  :base   => [
+  	    :username, 
+  	    :password, 
+  	    :host, 
+  	    :failure_email
+  	  ],
+  	  :do     => [
+  	    :command
+  	  ]
+  	}
 
-  	attr_accessor :username,
-                  :password,
-                  :host,
-                  :ssl,
-                  :failure_email
+  	attr_accessor :username, :password, :host, :ssl, :failure_email
 
   	# Initializes the DirectAdmin::Base class, setting defaults where necessary.
     # 
@@ -97,7 +102,7 @@ module DirectAdmin #:nodoc:
     #               :notify => 'no'}
     #
     # === Option GET parameters
-    # pass option GET parameters (like user) directly in as options
+    # Pass GET parameters (like :user) directly in as options
  
   	def do(options = {})
   	  check_required_options(:do, options)
@@ -106,39 +111,37 @@ module DirectAdmin #:nodoc:
 
       url = URI.parse(@host + @command)
           
-      #For GET Requests
-      #Some API actions, like CMD_API_SHOW_USER_DOMAINS must be requested via get
+      # For GET Requests..
+      # Some API actions, like CMD_API_SHOW_USER_DOMAINS must be requested via GET
       if options[:method] == 'get'
-    
         query = ''
         query_string = options.select {|k,v| not %w[command method].include?(k)}
-              unless query_string.empty?
-                query_params = query_string.collect {|k,v| "#{k}=#{v}"}
-                query << "?" << query_params.join("&")
-              end
+        
+        unless query_string.empty?
+          query_params = query_string.collect {|k,v| "#{k}=#{v}"}
+          query << "?" << query_params.join("&")
+        end
         
         req = Net::HTTP::Get.new('/'+ @command + query)
         req.basic_auth @username, @password
         
-        @response =  Net::HTTP.new( url.host, url.port).start {|http| http.request(req) }
-        
-
+        response = Net::HTTP.new( url.host, url.port).start {|http| http.request(req) }
       else
         req = Net::HTTP::Post.new(url.path)
         req.basic_auth @username, @password
+        
         # For POST requests..
         if options[:formdata]
           req.set_form_data(options[:formdata])
         end
-        @response = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
         
+        response = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
       end
       
-  
-      if @response
+      if response
     	  # @response.code = 200 | 404 | 500, etc.
         # @response.body = *text of returned page*
-        return @response
+        return response
     	else
     	  raise DirectAdminError.new("Unable to connect to DirectAdmin.")
     	end
@@ -157,10 +160,10 @@ module DirectAdmin #:nodoc:
   	  # Delimiter
   	  d = "&;"
   	  
-  	  @response = response
+  	  response = response
   	  
   	  params = {}
-      (@response||'').split(/[#{d}] */n).inject(params) { |h,p|
+      (response || '').split(/[#{d}] */n).inject(params) { |h,p|
         k, v=CGI.unescape(p).split('=',2)
         if cur = params[k]
           if cur.class == Array
@@ -172,23 +175,20 @@ module DirectAdmin #:nodoc:
           params[k] = v
         end
       }
-      
       return params
-  	  
 	  end
 	
-	  private
-      # Checks the supplied options for a given method or field and throws an exception if anything is missing
-      def check_required_options(option_set_name, options = {})
-        required_options = REQUIRED_OPTIONS[option_set_name]
-        missing = []
-        required_options.each{|option| missing << option if options[option].nil?}
-
-        unless missing.empty?
-          raise MissingInformationError.new("Missing #{missing.collect{|m| ":#{m}"}.join(', ')}")
-        end
+    private
+  
+    # Checks the supplied options for a given method or field and throws an exception if anything is missing
+    def check_required_options(option_set_name, options = {})
+      required_options = REQUIRED_OPTIONS[option_set_name]
+      missing = []
+      required_options.each{|option| missing << option if options[option].nil?}
+      unless missing.empty?
+        raise MissingInformationError.new("Missing #{missing.collect{|m| ":#{m}"}.join(', ')}")
       end
-
     end
   
+  end
 end
