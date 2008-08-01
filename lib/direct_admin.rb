@@ -107,8 +107,7 @@ module DirectAdmin #:nodoc:
   	def do(options = {})
   	  check_required_options(:do, options)
   	  
-  	  @command = options[:command]
-
+  	  command = options[:command]
       url = URI.parse(@host + @command)
           
       # For GET Requests..
@@ -122,7 +121,7 @@ module DirectAdmin #:nodoc:
           query << "?" << query_params.join("&")
         end
         
-        req = Net::HTTP::Get.new('/'+ @command + query)
+        req = Net::HTTP::Get.new('/'+ command + query)
         req.basic_auth @username, @password
         
         response = Net::HTTP.new( url.host, url.port).start {|http| http.request(req) }
