@@ -16,7 +16,7 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# THE SOFTWARE.s
 
 module DirectAdmin #:nodoc:
   
@@ -65,12 +65,11 @@ module DirectAdmin #:nodoc:
   	def initialize(options = {})
   	  check_required_options(:base, options)
 
-  	  @username			  = options[:username]
-  	  @password			  = options[:password]
-  	  @host				    = options[:host]
-  	  @ssl				    = options[:ssl]           || false
-  	  @failure_email	= options[:failure_email]
-  	  
+  	  @username = options[:username]
+  	  @password = options[:password]
+  	  @host = options[:host]
+  	  @ssl = options[:ssl] || false
+  	  @failure_email = options[:failure_email]
   	end
 
     # Completes a command on the DirectAdmin server.
@@ -117,19 +116,17 @@ module DirectAdmin #:nodoc:
         query_string = options.select {|k,v| not %w[command method].include?(k)}
         
         unless query_string.empty?
-          query_params = query_string.collect {|k,v| "#{k}=#{v}"}
-          query << "?" << query_params.join("&")
+          query_params = query_string.map {|k,v| "#{k}=#{v}"}.join("&")
         end
         
-        req = Net::HTTP::Get.new('/'+ command + query)
+        req = Net::HTTP::Get.new("/#{command}?#{query}")
         req.basic_auth @username, @password
         
         response = Net::HTTP.new( url.host, url.port).start {|http| http.request(req) }
-      else
+      else # For POST requests..
         req = Net::HTTP::Post.new(url.path)
         req.basic_auth @username, @password
         
-        # For POST requests..
         if options[:formdata]
           req.set_form_data(options[:formdata])
         end
@@ -177,7 +174,7 @@ module DirectAdmin #:nodoc:
       return params
 	  end
 	
-    private
+  private
   
     # Checks the supplied options for a given method or field and throws an exception if anything is missing
     def check_required_options(option_set_name, options = {})
