@@ -1,8 +1,7 @@
 require 'test/unit'
 
 class DirectAdminTest < Test::Unit::TestCase
-  # Replace this with your real tests.
-  def test_this_plugin
+  def test_to_flunk
     flunk
   end
 end
