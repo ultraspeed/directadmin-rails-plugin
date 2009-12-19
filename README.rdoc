@@ -1,0 +1,81 @@
+= DirectAdmin Rails Plugin (by {Josh Delsman}[http://voxxit.github.com])
+
+The DirectAdmin Rails plugin provides you with a communication
+class for interfacing directly with your DirectAdmin Web Control
+Panel.
+
+NOTE: I would recommend that until DA decides to move to an XML-
+based system, that you only use the commands which start with "CMD_API",
+most of which are updated here:
+
+* {Compatible DirectAdmin API Commands}[http://www.directadmin.com/search_versions.php?query=CMD_API]
+* {DirectAdmin API}[http://www.directadmin.com/api.html]
+
+== Installation
+
+Installation is simple:
+
+    script/plugin install git://github.com/voxxit/directadmin-rails-plugin.git
+
+== Example Usage
+
+First, you must initialise a DirectAdmin::Base object to use. This requires the DirectAdmin hostname, port, username and password, as well as a failure email for commands:
+
+    @da = DirectAdmin::Base.new(
+      :username       => "admin",
+      :password       => "password",
+      :host           => "http://host.com:2222/",
+      :port           => "2222",
+      :failure_email  => "admin@email.com"
+    )
+    
+If the API command requires POST and additional form data, such as username or password, you'll need to insert some form data. Here is an example from the CMD_API_ACCOUNT_USER command:
+
+    form_data = {
+      :action    => 'create',
+      :add       => 'Submit',
+      :username  => 'sampleuser',
+     	:email     => 'email@address.com',
+     	:passwd    => 'sample_Password',
+     	:passwd2   => 'sample_Password',
+     	:domain    => 'sample.com',
+     	:package   => 'packagename',
+     	:ip        => '127.0.0.1',
+     	:notify    => 'yes'
+    }
+
+If the API command requires GET (like CMD_API_SHOW_USER_DOMAINS does), you'll need to add the option :method => 'get' to your call and whatever GET parameters are required.
+
+Now, you can simply make the call! You will need to invoke the "do" method, which will communicate with the server, perform the function, and then report back with a URL encoded array/string:
+
+*Example with POST-enabled API call:*
+	
+    @show_users = @da.do(
+      :command => "CMD_API_SHOW_USERS"
+    )
+
+*Example with GET-enabled API call:*
+
+    @show_user_domains = @da.do(
+      :command => "CMD_API_SHOW_USER_DOMAINS", 
+			:method => 'get',
+			:user => user
+		)
+		
+You can optionally elect to parse the data into a usable and pretty handy hash, too: 
+
+    @hash = @da.parse(@show_users.body)
+
+== Bugs/Issues
+
+Please report all issues using the GitHub issue tracker at:
+
+http://github.com/voxxit/directadmin-rails-plugin/issues
+
+== Credit
+
+Author: Josh Delsman (http://voxxit.github.com)
+
+== License
+
+See the MIT-LICENSE file.
