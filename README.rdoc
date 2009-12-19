@@ -35,13 +35,13 @@ If the API command requires POST and additional form data, such as username or p
       :action    => 'create',
       :add       => 'Submit',
       :username  => 'sampleuser',
-     	:email     => 'email@address.com',
-     	:passwd    => 'sample_Password',
-     	:passwd2   => 'sample_Password',
-     	:domain    => 'sample.com',
-     	:package   => 'packagename',
-     	:ip        => '127.0.0.1',
-     	:notify    => 'yes'
+      :email     => 'email@address.com',
+      :passwd    => 'sample_Password',
+      :passwd2   => 'sample_Password',
+      :domain    => 'sample.com',
+      :package   => 'packagename',
+      :ip        => '127.0.0.1',
+      :notify    => 'yes'
     }
 
 If the API command requires GET (like CMD_API_SHOW_USER_DOMAINS does), you'll need to add the option :method => 'get' to your call and whatever GET parameters are required.
@@ -58,9 +58,9 @@ Now, you can simply make the call! You will need to invoke the "do" method, whic
 
     @show_user_domains = @da.do(
       :command => "CMD_API_SHOW_USER_DOMAINS", 
-			:method => 'get',
-			:user => user
-		)
+      :method => 'get',
+      :user => user
+    )
 		
 You can optionally elect to parse the data into a usable and pretty handy hash, too: 
 
